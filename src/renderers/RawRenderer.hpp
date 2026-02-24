@@ -4,8 +4,7 @@
 #include "Renderer.hpp"
 #include "cube.hpp"
 
-// Direct IO port bitmasks for the column pins
-
+// IO port bitmasks for the column pins
 /** Digital pins D22, D23, D24, D25, D26, D27, D28, D29 */
 #define PORTA_MASK (_BV(PA0)|_BV(PA1)|_BV(PA2)|_BV(PA3)|_BV(PA4)|_BV(PA5)|_BV(PA6)|_BV(PA7))
 /** Digital pins D10, D11, D12, D13 */
@@ -25,25 +24,20 @@
 /** Digital pins D48, D47, D46, D45, D44, D43, D42 */
 #define PORTL_MASK (_BV(PL1)|_BV(PL2)|_BV(PL3)|_BV(PL4)|_BV(PL5)|_BV(PL6)|_BV(PL7))
 
+// IO port bitmasks for layer pins
+/** Digital pins D54, D55, D56, D57, D58, D59, D60 */
+#define PORTF_MASK (_BV(PF0)|_BV(PF1)|_BV(PF2)|_BV(PF3)|_BV(PF4)|_BV(PF5)|_BV(PF6))
+
 /**
  * Renders the cube via interacting with raw port registers.
  *
- * This is specifically designed around the "ELEGOO MEGA R3 ATmega2560" board
+ * This is specifically designed around the Arduino MEGA Revision 3 (R3) board
  * and may not be compatible with other "MEGA" board variants or revisions.
  *
  * Refer to https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf for a detailed pinout.
  */
 class RawRenderer : public Renderer {
     byte currentLayer = 0;
-
-    /**
-     * Turns off all cube layer (A0 to A6 aka. D54 to D60).
-     * This turns off the entire cube in one atomic step (when interrupts are disabled).
-     */
-    static void disableAllLayers() {
-        // D54, D55, D56, D57, D58, D59, D60
-        PORTF &= ~(_BV(PF0) | _BV(PF1) | _BV(PF2) | _BV(PF3) | _BV(PF4) | _BV(PF5) | _BV(PF6));
-    }
 
 public:
     void setup() override {
@@ -53,15 +47,15 @@ public:
         noInterrupts();
 
         // Turn off all columns (D0 to D48)
-        PORTA &= ~(PORTA_MASK);
-        PORTB &= ~(PORTB_MASK);
-        PORTC &= ~(PORTC_MASK);
-        PORTD &= ~(PORTD_MASK);
-        PORTE &= ~(PORTE_MASK);
-        PORTG &= ~(PORTG_MASK);
-        PORTH &= ~(PORTH_MASK);
-        PORTJ &= ~(PORTJ_MASK);
-        PORTL &= ~(PORTL_MASK);
+        PORTA &= ~PORTA_MASK;
+        PORTB &= ~PORTB_MASK;
+        PORTC &= ~PORTC_MASK;
+        PORTD &= ~PORTD_MASK;
+        PORTE &= ~PORTE_MASK;
+        PORTG &= ~PORTG_MASK;
+        PORTH &= ~PORTH_MASK;
+        PORTJ &= ~PORTJ_MASK;
+        PORTL &= ~PORTL_MASK;
 
         // Configure all column pins to output (D0 to D48)
         DDRA |= PORTA_MASK;
@@ -74,11 +68,11 @@ public:
         DDRJ |= PORTJ_MASK;
         DDRL |= PORTL_MASK;
 
-        disableAllLayers();
+        // Turn off all layers (A0 to A6 aka. D54 to D60)
+        PORTF &= ~PORTF_MASK;
 
         // Configure all layer pins to output (A0 to A6 aka. D54 to D60)
-        // D54, D55, D56, D57, D58, D59, D60
-        DDRF |= _BV(DDF0) | _BV(DDF1) | _BV(DDF2) | _BV(DDF3) | _BV(DDF4) | _BV(DDF5) | _BV(DDF6);
+        DDRF |= PORTF_MASK;
 
         SREG = interrupts; // Restore interrupts
     }
@@ -87,7 +81,8 @@ public:
         auto interrupts = SREG;
         noInterrupts();
 
-        disableAllLayers();
+        // Turn off all layers (A0 to A6 aka. D54 to D60)
+        PORTF &= ~PORTF_MASK;
 
         // Enable/disable all columns
 
@@ -151,13 +146,13 @@ public:
                 PIN(1, 2, PJ0) | // D15
                 PIN(0, 2, PJ1); // D14
         PORTL = (PORTL & ~PORTL_MASK) |
-                PIN(6, 6, PD1) | // D48
-                PIN(5, 6, PD2) | // D47
-                PIN(4, 6, PD3) | // D46
-                PIN(3, 6, PD4) | // D45
-                PIN(2, 6, PD5) | // D44
-                PIN(1, 6, PD6) | // D43
-                PIN(0, 6, PD7); // D42
+                PIN(6, 6, PL1) | // D48
+                PIN(5, 6, PL2) | // D47
+                PIN(4, 6, PL3) | // D46
+                PIN(3, 6, PL4) | // D45
+                PIN(2, 6, PL5) | // D44
+                PIN(1, 6, PL6) | // D43
+                PIN(0, 6, PL7); // D42
 
         // Turn on current layer (one of A0 to A6 aka. D54 to D60)
         PORTF = _BV(currentLayer);

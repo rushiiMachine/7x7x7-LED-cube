@@ -1,19 +1,3 @@
-/**
-*    LED_Cube
-*
-*    Code for an Arduino Mega to control an LED cube.  Ports 0 to 48 should
-*    switch the columns, with (0,0 to 6) going to ports 0 to 6,
-*    (1,0 to 6) going to ports 7 to 13, etc.
-*
-*    Ports A0 through A6 control the layers with A0 controlling z = 0 and A6
-*    controlling z = 6.
-*
-*    Ports A8 to A15 serve as inputs for the pushbutton switches.
-*
-*    Program written by Lopuz3
-*    Spring 2013
-**/
-
 #include <Arduino.h>
 #include "cube.hpp"
 #include "Routine.hpp"
