@@ -16,18 +16,22 @@
 
 #include <Arduino.h>
 #include "cube.hpp"
-#include "CubeView.hpp"
 #include "Routine.hpp"
 #include "routines/AllOn.hpp"
+#include "Renderer.hpp"
+#include "renderers/StandardRenderer.hpp"
+#include "renderers/RawRenderer.hpp"
 
-auto cube = CubeView();
 Routine *currentRoutine = new AllOn();
+Renderer *cube = RAW_RENDERER
+                     ? dynamic_cast<Renderer *>(new RawRenderer())
+                     : dynamic_cast<Renderer *>(new StandardRenderer());
 
 boolean frames[2][CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];
 boolean (*activeFrame)[CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];
 
 void setupInterrupts() {
-    cli(); // Stop interrupts while we set them up
+    noInterrupts(); // Disable interrupts while setting up
     // Set up an interrupt with timer1
     TCCR1A = 0;
     TCCR1B = 0;
@@ -38,12 +42,12 @@ void setupInterrupts() {
     // Set to CS10 and CS12 so we have the 1024
     TCCR1B |= (1 << CS12) | (1 << CS10);
     TIMSK1 |= (1 << OCIE1A);
-    sei(); // Reallow interrupts
+    interrupts(); // Enable interrupts
 }
 
 // Called by the configured timer interrupt
 ISR(TIMER1_COMPA_vect) {
-    cube.displayLayer(activeFrame);
+    cube->renderLayer(activeFrame);
 }
 
 /**
@@ -64,8 +68,8 @@ void setup() {
         pinMode(i, OUTPUT);
     }
 
-    // setupInterrupts();
     // currentRoutine->setup(activeFrame);
+    // setupInterrupts();
 }
 
 void loop() {
