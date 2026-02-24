@@ -14,22 +14,33 @@ Renderer *cube = RAW_RENDERER
 boolean frames[2][CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];
 boolean (*activeFrame)[CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];
 
+/**
+* Configure the interrupt timer for controlling the cube pins.
+*/
 void setupInterrupts() {
     noInterrupts(); // Disable interrupts while setting up
-    // Set up an interrupt with timer1
+
+    // Clear timer configuration
     TCCR1A = 0;
     TCCR1B = 0;
+
+    // Reset timer to 0
     TCNT1 = 0;
-    // Make interrupt occur at the correct frequency, REFRESH_RATE*CUBE_SIZE
-    OCR1A = (16000000 / REFRESH_RATE / 1024 / CUBE_SIZE - 1);
-    TCCR1B |= (1 << WGM12);
-    // Set to CS10 and CS12 so we have the 1024
-    TCCR1B |= (1 << CS12) | (1 << CS10);
-    TIMSK1 |= (1 << OCIE1A);
+
+    // Set interrupt frequency with a 1024 prescaler, REFRESH_RATE*CUBE_SIZE
+    OCR1A = F_CPU / 1024 / REFRESH_RATE / CUBE_SIZE - 1;
+    // Set timer to CTC mode (Clear Timer on Compare Match)
+    TCCR1B |= _BV(WGM12);
+    // Set timer prescaler to tick only once every 1024 CPU cycles
+    TCCR1B |= _BV(CS12) | _BV(CS10);
+
+    TIMSK1 |= _BV(OCIE1A); // Enable timer interrupt
     interrupts(); // Enable interrupts
 }
 
-// Called by the configured timer interrupt
+/**
+ * The handler for the timer interrupt configured in @link setupInterrupts@endlink.
+ */
 ISR(TIMER1_COMPA_vect) {
     cube->renderLayer(activeFrame);
 }
@@ -46,24 +57,12 @@ unsigned long getTimeSinceLastFrameInMicros() {
 }
 
 void setup() {
-    pinMode(52, OUTPUT);
-    digitalWrite(52, HIGH);
-    for (auto i = 0; i < CUBE_SIZE; ++i) {
-        pinMode(i, OUTPUT);
-    }
-
-    // currentRoutine->setup(activeFrame);
-    // setupInterrupts();
+    currentRoutine->setup(activeFrame);
+    setupInterrupts();
 }
 
 void loop() {
-    for (auto i = 0; i < CUBE_SIZE; ++i) {
-        digitalWrite(i, HIGH);
-        delay(100);
-        digitalWrite(i, LOW);
-    }
-
-    // const auto nextFrame = &frames[0] == activeFrame ? &frames[1] : &frames[0];
-    // currentRoutine->update(getTimeSinceLastFrameInMicros(), nextFrame);
-    // activeFrame = nextFrame;
+    const auto nextFrame = &frames[0] == activeFrame ? &frames[1] : &frames[0];
+    currentRoutine->update(getTimeSinceLastFrameInMicros(), nextFrame);
+    activeFrame = nextFrame;
 }
