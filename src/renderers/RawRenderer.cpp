@@ -141,9 +141,8 @@ void RawRenderer::renderLayer(const boolean (*model)[CUBE_SIZE][CUBE_SIZE][CUBE_
     // Turn on current layer (one of A0 to A6 aka. D54 to D60)
     PORTF = _BV(currentLayer);
 
-    // Advance layer for next the render
-    currentLayer++;
-    currentLayer = currentLayer % CUBE_SIZE;
+    // Advance layer for the next render
+    currentLayer = (currentLayer + 1) % CUBE_SIZE;
 
     SREG = interrupts; // Restore interrupts
 }

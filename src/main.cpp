@@ -68,7 +68,7 @@ unsigned long getTimeSinceLastFrameInMicros() {
 
 void nextRoutine() {
     constexpr auto routineCount = sizeof(routineFactories) / sizeof(routineFactories[0]);
-    currentRoutineIdx = ++currentRoutineIdx % routineCount;
+    currentRoutineIdx = (currentRoutineIdx + 1) % routineCount;
     currentRoutine = routineFactories[currentRoutineIdx]();
     currentRoutine->setup(&frames[frameActiveIdx]);
 }
