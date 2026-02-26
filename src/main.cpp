@@ -2,6 +2,7 @@
 #include "cube.hpp"
 #include "Routine.hpp"
 #include "routines/AllOn.hpp"
+#include "routines/Fade.hpp"
 #include "Renderer.hpp"
 #include "renderers/StandardRenderer.hpp"
 #include "renderers/RawRenderer.hpp"
@@ -57,6 +58,7 @@ unsigned long getTimeSinceLastFrameInMicros() {
 }
 
 void setup() {
+    randomSeed(analogRead(UNUSED_ANALOG_PIN));
     currentRoutine->setup(activeFrame);
     setupInterrupts();
 }

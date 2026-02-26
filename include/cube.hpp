@@ -7,6 +7,12 @@
 #define CUBE_SIZE 7
 
 /**
+ * An unused floating analog pin that is used for seeding RNG.
+ * Default is A15 aka. D69.
+ */
+#define UNUSED_ANALOG_PIN A15
+
+/**
  * The rate to multiplex the entire cube at.
  * This sets the rate at which the entire cube renders a new frame.
  *

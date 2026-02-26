@@ -21,10 +21,10 @@ public:
 
     /**
      * Configures the cube display for the next frame.
+     * @param cube The current cube state to reconfigure. This contains the previous frame.
      * @param dt Delta time since last frame in microseconds
-     * @param dt The current cube state to reconfigure. This contains the previous frame.
      */
-    virtual void update(unsigned long dt, boolean (*cube)[CUBE_SIZE][CUBE_SIZE][CUBE_SIZE]) {
+    virtual void update(boolean (*cube)[CUBE_SIZE][CUBE_SIZE][CUBE_SIZE], unsigned long dt) {
         // Ignore
     }
 };
