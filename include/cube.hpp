@@ -7,13 +7,19 @@
 #define CUBE_SIZE 7
 
 /**
- * The rate to multiplex the LEDs at.
- * For example, at 60 fps, each layer is individually turned on and off 60 times per second.
- * TODO: verify this claim
+ * The rate to multiplex the entire cube at.
+ * This sets the rate at which the entire cube renders a new frame.
+ *
+ * For example at 60 fps, the cube displays 60 distinct frames a second.
+ * The internal multiplexing rate is higher to display each layer individually.
  */
+#ifndef REFRESH_RATE
 #define REFRESH_RATE 60
+#endif
 
 /**
  * Whether to enable the raw renderer that utilizes raw port register writes for faster rendering.
  */
+#ifndef RAW_RENDERER
 #define RAW_RENDERER false
+#endif

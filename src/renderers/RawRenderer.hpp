@@ -46,6 +46,12 @@ public:
         auto interrupts = SREG;
         noInterrupts();
 
+        // Turn off all layers (A0 to A6 aka. D54 to D60)
+        PORTF &= ~PORTF_MASK;
+
+        // Configure all layer pins to output (A0 to A6 aka. D54 to D60)
+        DDRF |= PORTF_MASK;
+
         // Turn off all columns (D0 to D48)
         PORTA &= ~PORTA_MASK;
         PORTB &= ~PORTB_MASK;
@@ -67,12 +73,6 @@ public:
         DDRH |= PORTH_MASK;
         DDRJ |= PORTJ_MASK;
         DDRL |= PORTL_MASK;
-
-        // Turn off all layers (A0 to A6 aka. D54 to D60)
-        PORTF &= ~PORTF_MASK;
-
-        // Configure all layer pins to output (A0 to A6 aka. D54 to D60)
-        DDRF |= PORTF_MASK;
 
         SREG = interrupts; // Restore interrupts
     }

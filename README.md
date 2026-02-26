@@ -1,6 +1,34 @@
 # 7³ LED Cube
 
-TODO
+Firmware for a 7x7x7 LED cube powered by an Arduino MEGA 2560.
+
+## Building & Flashing
+
+1. [Install PlatformIO](https://docs.platformio.org/en/latest/core/installation/index.html)
+2. Clone this repository
+3. Connect a compatible microcontroller such as:
+    - Arduino Mega 2560 Rev3
+    - ELEGOO MEGA R3 Board ATmega 2560
+4. Run one of these commands in the cloned repository:
+
+```shell
+# For Arduino Mega 2560 Rev3
+$ platformio run -e ATmega2560 --target upload
+
+# For ELEGOO MEGA R3 Board ATmega 2560
+$ platformio run -e ELEGOO_ATmega2560 --target upload
+```
+
+### Fast Renderer
+
+To use the (experimental) fast renderer that utilizes raw IO port writes, set
+this environment variable prior to running the flashing command:
+
+```shell
+$ export PLATFORMIO_BUILD_FLAGS="-DRAW_RENDERER=true"
+```
+
+Alternatively, modify the appropriate configuration value in [`./include/cube.hpp`](./include/cube.hpp).
 
 ## Wiring
 
