@@ -7,13 +7,22 @@
 #include "renderers/StandardRenderer.hpp"
 #include "renderers/RawRenderer.hpp"
 
-Routine *currentRoutine = new AllOn();
+boolean frames[2][CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];
+size_t frameActiveIdx = 0;
+
 Renderer *cube = RAW_RENDERER
                      ? dynamic_cast<Renderer *>(new RawRenderer())
                      : dynamic_cast<Renderer *>(new StandardRenderer());
 
-boolean frames[2][CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];
-boolean (*activeFrame)[CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];
+
+using RoutineFactory = Routine* (*)();
+
+RoutineFactory routineFactories[] = {
+    []() -> Routine * { return new AllOn(); },
+    []() -> Routine * { return new Fade(); },
+};
+size_t currentRoutineIdx = 0;
+Routine *currentRoutine = routineFactories[currentRoutineIdx]();
 
 /**
 * Configure the interrupt timer for controlling the cube pins.
@@ -43,7 +52,7 @@ void setupInterrupts() {
  * The handler for the timer interrupt configured in @link setupInterrupts@endlink.
  */
 ISR(TIMER1_COMPA_vect) {
-    cube->renderLayer(activeFrame);
+    cube->renderLayer(&frames[frameActiveIdx]);
 }
 
 /**
@@ -57,14 +66,29 @@ unsigned long getTimeSinceLastFrameInMicros() {
     return dt;
 }
 
+void nextRoutine() {
+    constexpr auto routineCount = sizeof(routineFactories) / sizeof(routineFactories[0]);
+    currentRoutineIdx = ++currentRoutineIdx % routineCount;
+    currentRoutine = routineFactories[currentRoutineIdx]();
+    currentRoutine->setup(&frames[frameActiveIdx]);
+}
+
 void setup() {
     randomSeed(analogRead(UNUSED_ANALOG_PIN));
-    currentRoutine->setup(activeFrame);
+    currentRoutine->setup(&frames[frameActiveIdx]);
     setupInterrupts();
 }
 
 void loop() {
-    const auto nextFrame = &frames[0] == activeFrame ? &frames[1] : &frames[0];
-    currentRoutine->update(getTimeSinceLastFrameInMicros(), nextFrame);
-    activeFrame = nextFrame;
+    static auto buttonPressed = false;
+    if (!buttonPressed && digitalRead(BUTTON_PIN) == LOW) {
+        buttonPressed = true;
+        nextRoutine();
+    } else {
+        buttonPressed = false;
+    }
+
+    const auto frameNextIdx = (frameActiveIdx + 1) % (sizeof(frames) / sizeof(frames[0]));
+    currentRoutine->update(&frames[frameNextIdx], getTimeSinceLastFrameInMicros());
+    frameActiveIdx = frameNextIdx;
 }

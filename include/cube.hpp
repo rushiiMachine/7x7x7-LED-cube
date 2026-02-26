@@ -13,6 +13,12 @@
 #define UNUSED_ANALOG_PIN A15
 
 /**
+ * Pin used for the button to switch routines.
+ * Default is A7 aka. D61.
+ */
+#define BUTTON_PIN A7
+
+/**
  * The rate to multiplex the entire cube at.
  * This sets the rate at which the entire cube renders a new frame.
  *
