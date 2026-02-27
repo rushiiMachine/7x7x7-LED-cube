@@ -1,0 +1,5 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "FQP30N06L_C243087")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbol/FQP30N06L_C243087.kicad_sym")(options "")(descr ""))
+  (lib (name "arduino-library")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbol/arduino-library.kicad_sym")(options "")(descr ""))
+)
