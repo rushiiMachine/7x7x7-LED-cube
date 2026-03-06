@@ -2,4 +2,5 @@
   (version 7)
   (lib (name "FQP30N06L_C243087")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbol/FQP30N06L_C243087.kicad_sym")(options "")(descr ""))
   (lib (name "arduino-library")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbol/arduino-library.kicad_sym")(options "")(descr ""))
+  (lib (name "16V2200uf_10X20")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbol/16V2200uf_10X20.kicad_sym")(options "")(descr ""))
 )

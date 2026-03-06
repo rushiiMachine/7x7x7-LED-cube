@@ -75,6 +75,7 @@ void nextRoutine() {
 
 void setup() {
     randomSeed(analogRead(UNUSED_ANALOG_PIN));
+    pinMode(BUTTON_PIN, INPUT_PULLUP);
     currentRoutine->setup(&frames[frameActiveIdx]);
     setupInterrupts();
 }
