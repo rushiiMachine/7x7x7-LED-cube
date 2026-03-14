@@ -2,6 +2,7 @@
 #include "cube.hpp"
 #include "Routine.hpp"
 #include "routines/AllOn.hpp"
+#include "routines/Test.hpp"
 #include "routines/Fade.hpp"
 #include "Renderer.hpp"
 #include "renderers/StandardRenderer.hpp"
@@ -20,6 +21,7 @@ using RoutineFactory = Routine* (*)();
 
 RoutineFactory routineFactories[] = {
     []() -> Routine * { return new AllOn(); },
+    []() -> Routine * { return new Test(); },
     []() -> Routine * { return new Fade(); },
 };
 size_t currentRoutineIdx = 0;
