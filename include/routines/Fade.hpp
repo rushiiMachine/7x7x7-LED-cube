@@ -15,5 +15,6 @@ public:
 private:
     bool isLighting = true;
     uint32_t elapsedOverflowUs = 0;
+    uint32_t delayUs = 0;
     uint16_t unchangedCount = PIXELS_COUNT;
 };

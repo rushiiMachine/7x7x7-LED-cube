@@ -1,8 +1,11 @@
 #include "routines/Fade.hpp"
+#include "utils.hpp"
 
 constexpr uint32_t STEP_US = 25 * 1000UL; // 25ms
+constexpr uint32_t DELAY_MAX_US = 5 * 1000 * 1000UL; // 5s
 
 void Fade::update(boolean (*cube)[CUBE_SIZE][CUBE_SIZE][CUBE_SIZE], const unsigned long dt) {
+    if ((delayUs = sat_sub_uint32(delayUs, dt)) > 0) return;
     if ((elapsedOverflowUs += dt) < STEP_US) return;
 
     elapsedOverflowUs -= STEP_US;
@@ -28,5 +31,9 @@ void Fade::update(boolean (*cube)[CUBE_SIZE][CUBE_SIZE][CUBE_SIZE], const unsign
     if (unchangedCount == 0) {
         unchangedCount = PIXELS_COUNT;
         isLighting = !isLighting;
+
+        if (isLighting) {
+            delayUs = random(DELAY_MAX_US);
+        }
     }
 }
