@@ -7,12 +7,13 @@
 #include "renderers/StandardRenderer.hpp"
 #include "renderers/RawRenderer.hpp"
 
-boolean frames[2][CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];
+constexpr size_t FRAME_COUNT = 2;
+boolean frames[FRAME_COUNT][CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];
 size_t frameActiveIdx = 0;
 
 Renderer *renderer = RAW_RENDERER
-                     ? dynamic_cast<Renderer *>(new RawRenderer())
-                     : dynamic_cast<Renderer *>(new StandardRenderer());
+                         ? dynamic_cast<Renderer *>(new RawRenderer())
+                         : dynamic_cast<Renderer *>(new StandardRenderer());
 
 
 using RoutineFactory = Routine* (*)();
@@ -66,18 +67,27 @@ unsigned long getTimeSinceLastFrameInMicros() {
     return dt;
 }
 
+void setupFrames() {
+    memset(frames, false, sizeof(frames));
+
+    for (auto &frame: frames) {
+        currentRoutine->setup(&frame);
+    }
+}
+
 void nextRoutine() {
     constexpr auto routineCount = sizeof(routineFactories) / sizeof(routineFactories[0]);
     currentRoutineIdx = (currentRoutineIdx + 1) % routineCount;
     currentRoutine = routineFactories[currentRoutineIdx]();
-    currentRoutine->setup(&frames[frameActiveIdx]);
+
+    setupFrames();
 }
 
 void setup() {
     randomSeed(analogRead(SEED_PIN));
     pinMode(BUTTON_PIN, INPUT_PULLUP);
     renderer->setup();
-    currentRoutine->setup(&frames[frameActiveIdx]);
+    setupFrames();
     setupInterrupts();
 }
 
@@ -86,11 +96,15 @@ void loop() {
     if (!buttonPressed && digitalRead(BUTTON_PIN) == LOW) {
         buttonPressed = true;
         nextRoutine();
-    } else {
+    } else if (buttonPressed && digitalRead(BUTTON_PIN) == HIGH) {
         buttonPressed = false;
     }
 
-    const auto frameNextIdx = (frameActiveIdx + 1) % (sizeof(frames) / sizeof(frames[0]));
-    currentRoutine->update(&frames[frameNextIdx], getTimeSinceLastFrameInMicros());
-    frameActiveIdx = frameNextIdx;
+    if (currentRoutine->useFrameBuffering) {
+        const auto frameNextIdx = (frameActiveIdx + 1) % FRAME_COUNT;
+        currentRoutine->update(&frames[frameNextIdx], getTimeSinceLastFrameInMicros());
+        frameActiveIdx = frameNextIdx;
+    } else {
+        currentRoutine->update(&frames[frameActiveIdx], getTimeSinceLastFrameInMicros());
+    }
 }

@@ -22,7 +22,7 @@ void StandardRenderer::renderLayer(const boolean (*model)[CUBE_SIZE][CUBE_SIZE][
     // Enable/disable all columns
     for (byte x = 0; x < CUBE_SIZE; x++) {
         for (byte y = 0; y < CUBE_SIZE; y++) {
-            digitalWrite(CUBE_SIZE * y + x, *model[x][y][currentLayer]);
+            digitalWrite(CUBE_SIZE * y + x, (*model)[x][y][currentLayer]);
         }
     }
 

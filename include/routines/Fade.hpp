@@ -4,8 +4,6 @@
 #include "cube.hpp"
 #include "../Routine.hpp"
 
-#define FADE_STEP_US 25000
-
 /**
  * Routine that lights up a random pixel one by one until the entire cube is lit,
  * and then randomly turn them off one by one, and repeat.
@@ -16,6 +14,6 @@ public:
 
 private:
     bool isLighting = true;
-    uint16_t elapsedOverflowUs = 0;
-    uint16_t unchangedCount = 0;
+    uint32_t elapsedOverflowUs = 0;
+    uint16_t unchangedCount = PIXELS_COUNT;
 };

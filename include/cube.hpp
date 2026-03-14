@@ -2,9 +2,14 @@
 
 /**
  * The LED count of the cube along any axis.
- * For a 7x7x7 cube there is 343 total LEDs.
  */
 #define CUBE_SIZE 7
+
+/**
+ * The total amount of LEDs in the cube.
+ * For a 7x7x7 cube there is 343 total LEDs.
+ */
+#define PIXELS_COUNT (CUBE_SIZE * CUBE_SIZE * CUBE_SIZE)
 
 /**
  * An unused floating analog pin that is used for seeding RNG.

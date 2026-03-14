@@ -11,6 +11,14 @@ public:
     virtual ~Routine() = default;
 
     /**
+     * Whether to use multiple frames during drawing. This
+     * should only be enabled when the entire cube is rendered upon
+     * every frame @link update@endlink, as opposed to only updating a subset
+     * of pixels every update.
+     */
+    bool useFrameBuffering = false;
+
+    /**
      * Initially configured the cube display for the first frame of this routine.
      * If this display is static, then the cube can be configured just once here without updating.
      * @param cube The current cube state to reconfigure. This may contain a previous frame from a different routine.
