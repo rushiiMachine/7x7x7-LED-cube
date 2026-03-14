@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "cube.hpp"
+#include "wiring.hpp"
 #include "Routine.hpp"
 #include "routines/AllOn.hpp"
 #include "routines/Test.hpp"

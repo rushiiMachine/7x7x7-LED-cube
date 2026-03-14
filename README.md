@@ -28,7 +28,7 @@ this environment variable prior to running the flashing command:
 $ export PLATFORMIO_BUILD_FLAGS="-DRAW_RENDERER=true"
 ```
 
-Alternatively, modify the appropriate configuration value in [`./include/cube.hpp`](./include/cube.hpp).
+Alternatively, modify the appropriate configuration value in [`./include/wiring.hpp`](./include/wiring.hpp).
 
 ## Wiring
 
@@ -53,4 +53,10 @@ Any control buttons ideally should be visible to you.
 Each layer ground (7 total) is wired through a separate transistor to the digital/analog pins
 A0 to A6 aka., D54 to D60. Layer 0 should be wired to D54, Layer 1 to D55 and so on.
 
-[//]: # (TODO: button wiring)
+The button to toggle between different animations should be wired between A7 and GND.
+
+### Custom wiring
+
+If wiring the cube in exactly the way described above is impractical, you may remap the pins
+in [`./include/wiring.hpp`](./include/wiring.hpp) by uncommenting the `COLUMN_PIN_MAPPING` and
+`LAYER_PIN_MAPPING` sections, and changing the other configuration values.

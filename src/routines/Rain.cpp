@@ -41,10 +41,11 @@ void Rain::update(boolean (*cube)[CUBE_SIZE][CUBE_SIZE][CUBE_SIZE], const unsign
         }
     }
 
+    // Spawn new pixels once timer triggers
     if ((spawnDelay = sat_sub_uint32(spawnDelay, dt)) == 0) {
         spawnDelay = SPAWN_US;
 
-        const auto count = random(SPAWN_COUNT);
+        const uint8_t count = random(SPAWN_COUNT);
 
         for (auto i = 0; i < count; ++i) {
             const auto x = random(CUBE_SIZE);

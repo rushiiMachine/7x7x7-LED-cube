@@ -12,18 +12,6 @@
 #define PIXELS_COUNT (CUBE_SIZE * CUBE_SIZE * CUBE_SIZE)
 
 /**
- * An unused floating analog pin that is used for seeding RNG.
- * Default is A15 aka. D69.
- */
-#define SEED_PIN A15
-
-/**
- * Pin used for the button to switch routines.
- * Default is D52.
- */
-#define BUTTON_PIN 52
-
-/**
  * The rate to multiplex the entire cube at.
  * This sets the rate at which the entire cube is rendered per second.
  *
@@ -33,11 +21,4 @@
  */
 #ifndef REFRESH_RATE
 #define REFRESH_RATE 120
-#endif
-
-/**
- * Whether to enable the raw renderer that utilizes raw port register writes for faster rendering.
- */
-#ifndef RAW_RENDERER
-#define RAW_RENDERER false
 #endif
