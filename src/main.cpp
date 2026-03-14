@@ -4,6 +4,7 @@
 #include "routines/AllOn.hpp"
 #include "routines/Test.hpp"
 #include "routines/Fade.hpp"
+#include "routines/Ripple.hpp"
 #include "Renderer.hpp"
 #include "renderers/StandardRenderer.hpp"
 #include "renderers/RawRenderer.hpp"
@@ -23,6 +24,7 @@ RoutineFactory routineFactories[] = {
     []() -> Routine * { return new AllOn(); },
     []() -> Routine * { return new Test(); },
     []() -> Routine * { return new Fade(); },
+    []() -> Routine * { return new Ripple(); },
 };
 size_t currentRoutineIdx = 0;
 Routine *currentRoutine = routineFactories[currentRoutineIdx]();
