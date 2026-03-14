@@ -16,6 +16,6 @@ public:
 
 private:
     bool isLighting = true;
-    uint16_t elapsedOverflow = 0;
+    uint16_t elapsedOverflowUs = 0;
     uint16_t unchangedCount = 0;
 };

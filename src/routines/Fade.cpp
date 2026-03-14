@@ -1,8 +1,8 @@
 #include "routines/Fade.hpp"
 
 void Fade::update(boolean (*cube)[CUBE_SIZE][CUBE_SIZE][CUBE_SIZE], unsigned long dt) {
-    if ((elapsedOverflow += dt) < FADE_STEP_US) return;
-    elapsedOverflow -= FADE_STEP_US;
+    if ((elapsedOverflowUs += dt) < FADE_STEP_US) return;
+    elapsedOverflowUs -= FADE_STEP_US;
 
     // Randomly index into the set of pixels that are unchanged
     const auto targetUnchangedIdx = random(unchangedCount);

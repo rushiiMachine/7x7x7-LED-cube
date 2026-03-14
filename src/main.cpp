@@ -10,7 +10,7 @@
 boolean frames[2][CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];
 size_t frameActiveIdx = 0;
 
-Renderer *cube = RAW_RENDERER
+Renderer *renderer = RAW_RENDERER
                      ? dynamic_cast<Renderer *>(new RawRenderer())
                      : dynamic_cast<Renderer *>(new StandardRenderer());
 
@@ -52,7 +52,7 @@ void setupInterrupts() {
  * The handler for the timer interrupt configured in @link setupInterrupts@endlink.
  */
 ISR(TIMER1_COMPA_vect) {
-    cube->renderLayer(&frames[frameActiveIdx]);
+    renderer->renderLayer(&frames[frameActiveIdx]);
 }
 
 /**
@@ -74,8 +74,9 @@ void nextRoutine() {
 }
 
 void setup() {
-    randomSeed(analogRead(UNUSED_ANALOG_PIN));
+    randomSeed(analogRead(SEED_PIN));
     pinMode(BUTTON_PIN, INPUT_PULLUP);
+    renderer->setup();
     currentRoutine->setup(&frames[frameActiveIdx]);
     setupInterrupts();
 }
