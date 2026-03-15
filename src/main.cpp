@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <avr/sleep.h>
 #include "cube.hpp"
 #include "wiring.hpp"
 #include "Routine.hpp"
@@ -14,7 +15,7 @@
 
 constexpr size_t FRAME_COUNT = 2;
 boolean frames[FRAME_COUNT][CUBE_SIZE][CUBE_SIZE][CUBE_SIZE];
-size_t frameActiveIdx = 0;
+volatile size_t frameActiveIdx = 0;
 
 Renderer *renderer = RAW_RENDERER
                          ? dynamic_cast<Renderer *>(new RawRenderer())
@@ -35,9 +36,16 @@ size_t currentRoutineIdx = 0;
 Routine *currentRoutine = routineFactories[currentRoutineIdx]();
 
 /**
-* Configure the interrupt timer for controlling the cube pins.
+ * Disables the interrupt timer for rendering the cube.
+ */
+void teardownRenderingTimer() {
+    TIMSK1 &= ~(_BV(OCIE1A)); // Disable timer interrupt
+}
+
+/**
+* Configure the interrupt timer for rendering the cube LEDs.
 */
-void setupInterrupts() {
+void setupRenderingTimer() {
     noInterrupts(); // Disable interrupts while setting up
 
     // Clear timer configuration
@@ -59,7 +67,7 @@ void setupInterrupts() {
 }
 
 /**
- * The handler for the timer interrupt configured in @link setupInterrupts@endlink.
+ * The callback for the timer interrupt configured in @link setupRenderingTimer@endlink.
  */
 ISR(TIMER1_COMPA_vect) {
     renderer->renderLayer(&frames[frameActiveIdx]);
@@ -92,22 +100,70 @@ void nextRoutine() {
     setupFrames();
 }
 
+void wakeUp() {
+    detachInterrupt(digitalPinToInterrupt(BUTTON_PIN));
+    sleep_disable();
+
+    setupRenderingTimer();
+}
+
+void startSleep() {
+    teardownRenderingTimer();
+    renderer->setup(); // Turn off cube
+
+    // Wait for button to be released
+    while (digitalRead(BUTTON_PIN) == LOW) {
+        delay(10); // Wait 10ms
+    }
+
+    noInterrupts();
+    attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), wakeUp, LOW);
+    set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+    sleep_enable();
+    interrupts();
+    sleep_cpu();
+}
+
+void checkButton() {
+    constexpr auto BUTTON_DEBOUNCE_MS = 250; // 250ms
+    constexpr auto BUTTON_SLEEP_MS = 2 * 1000; // 2s
+
+    static unsigned long buttonPressedMs = 0;
+    static unsigned long buttonReleasedMs = 0;
+
+    const auto pressed = digitalRead(BUTTON_PIN) == LOW;
+
+    if (pressed
+        && buttonPressedMs == 0 // New press
+        && millis() - buttonReleasedMs > BUTTON_DEBOUNCE_MS // Throttle new presses
+    ) {
+        buttonPressedMs = millis();
+        nextRoutine();
+    } else if (buttonPressedMs > 0 // Was pressed
+               && !pressed // No longer pressed
+    ) {
+        buttonPressedMs = 0;
+        buttonReleasedMs = millis();
+    } else if (pressed // Is currently pressed
+               && buttonPressedMs > 0 // Was pressed
+               && millis() - buttonPressedMs >= BUTTON_SLEEP_MS // Was pressed for long time
+    ) {
+        buttonPressedMs = 0;
+        buttonReleasedMs = millis();
+        startSleep();
+    }
+}
+
 void setup() {
     randomSeed(analogRead(SEED_PIN));
     pinMode(BUTTON_PIN, INPUT_PULLUP);
     renderer->setup();
     setupFrames();
-    setupInterrupts();
+    setupRenderingTimer();
 }
 
 void loop() {
-    static auto buttonPressed = false;
-    if (!buttonPressed && digitalRead(BUTTON_PIN) == LOW) {
-        buttonPressed = true;
-        nextRoutine();
-    } else if (buttonPressed && digitalRead(BUTTON_PIN) == HIGH) {
-        buttonPressed = false;
-    }
+    checkButton();
 
     if (currentRoutine->useFrameBuffering) {
         const auto frameNextIdx = (frameActiveIdx + 1) % FRAME_COUNT;

@@ -18,9 +18,15 @@ constexpr uint8_t SEED_PIN = A15;
 
 /**
  * Pin used for the button to switch routines.
- * Default is A7 aka. D61.
+ * The other side of this button must be connected to GND.
+ *
+ * To support wakeup from sleep, the specified pin must be as `INT[x]`, indicating it supports interrupts.
+ * Refer to this pinout for details: https://docs.arduino.cc/resources/pinouts/A000067-full-pinout.pdf
+ *
+ * Since the default, D21, is also used by the column pins, using the default would require
+ * remapping the column pins below.
  */
-constexpr uint8_t BUTTON_PIN = A7;
+constexpr uint8_t BUTTON_PIN = 21;
 
 // #ifndef LAYER_REMAPPING
 // #define LAYER_REMAPPING
