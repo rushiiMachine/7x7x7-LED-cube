@@ -6,6 +6,7 @@
 #include "routines/Test.hpp"
 #include "routines/Fade.hpp"
 #include "routines/Rain.hpp"
+#include "routines/Snake.hpp"
 #include "routines/Ripple.hpp"
 #include "Renderer.hpp"
 #include "renderers/StandardRenderer.hpp"
@@ -27,6 +28,7 @@ RoutineFactory routineFactories[] = {
     []() -> Routine * { return new Test(); },
     []() -> Routine * { return new Fade(); },
     []() -> Routine * { return new Rain(); },
+    []() -> Routine * { return new Snake(); },
     []() -> Routine * { return new Ripple(); },
 };
 size_t currentRoutineIdx = 0;
