@@ -104,10 +104,20 @@ void wakeUp() {
     detachInterrupt(digitalPinToInterrupt(BUTTON_PIN));
     sleep_disable();
 
+    // Reset to AllOn routine
+    currentRoutineIdx = 0;
+    currentRoutine = routineFactories[currentRoutineIdx]();
+    setupFrames();
+
     setupRenderingTimer();
+
+    // Wait for button to be released
+    while (digitalRead(BUTTON_PIN) == LOW) {
+        delay(10); // Wait 10ms
+    }
 }
 
-void startSleep() {
+void trySleep() {
     teardownRenderingTimer();
     renderer->setup(); // Turn off cube
 
@@ -150,7 +160,7 @@ void checkButton() {
     ) {
         buttonPressedMs = 0;
         buttonReleasedMs = millis();
-        startSleep();
+        trySleep();
     }
 }
 

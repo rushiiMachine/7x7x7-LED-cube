@@ -1,6 +1,6 @@
 #include "routines/Test.hpp"
 
-constexpr uint32_t STEP_US = 1 * 1000 * 1000UL; // 1s
+constexpr uint32_t STEP_US = 250 * 1000UL; // 250ms
 
 void Test::update(boolean (*cube)[CUBE_SIZE][CUBE_SIZE][CUBE_SIZE], const unsigned long dt) {
     if ((elapsedOverflowUs += dt) < STEP_US) return;
